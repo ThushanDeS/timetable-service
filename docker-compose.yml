@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  timetable-service:
+    build: .
+    container_name: timetable-service
+    ports:
+      - '3003:3003'
+    environment:
+      - PORT=3003
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/timetable-service
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - COURSE_SERVICE_URL=http://course-service:3002
+      - JWT_SECRET=dev-secret-key-change-in-production
+    depends_on:
+      - mongo
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: timetable-mongo
+    ports:
+      - '27019:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+networks:
+  campus-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
